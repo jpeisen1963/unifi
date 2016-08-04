@@ -1,0 +1,27 @@
+#!/bin/bash
+dump_directory=/home/jpe/data/usg_config_history
+last_dump=$(ls ${dump_directory}/usg_config.*.json | tail -1)
+new_dump=$(date +"${dump_directory}/usg_config.%Y%m%d%H%M.json")
+new_config=$(date +"${dump_directory}/config.gateway.json.%Y%m%d%H%M")
+
+date +"%Y-%m-%d %H:%M:%S - $0 starting"
+ssh usg mca-ctrl -t dump-cfg > $new_dump 2>/dev/null
+
+if [ -s "$new_dump" ] ; then
+  if cmp "${new_dump}" "${last_dump}" ; then
+    date +"%Y-%m-%d - no changes - removing new dump ${new_dump}"
+    rm "${new_dump}"
+  else
+    /home/jpe/bin/usg_diff \
+      /usr/lib/unifi/data/devices/ugw/44-d9-e7-9e-a6-cf/system.cfg \
+      /usr/lib/unifi/data/sites/default/config.gateway.json \
+      ${filename} > "$new_config"
+
+    date +"%Y-%m-%d %H:%M:%S - Generated new config.gateway.json"
+    rm "${dump_directory}/config.gateway.json"
+    ln "${new_config}" "${dump_directory}/config.gateway.json"
+  fi
+else
+  date +"%Y-%m-%d - zero-length file - removing new dump ${new_dump}"
+  rm -f "$new_dump"
+fi
