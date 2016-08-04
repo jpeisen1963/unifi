@@ -10,6 +10,10 @@ import re
 # config sub-trees we never want to be in the result
 NeverKeep = (
     ["firewall", "group", "address-group", "unifi_controller_addresses"],
+    ["firewall", "group", "port-group", "guest_portal_ports", "port"],
+    ["firewall", "group", "port-group", "guest_portal_redirector_ports", "port"],
+    ["firewall", "group", "port-group", "unifi_controller_ports-tcp", "port"],
+    ["firewall", "group", "port-group", "unifi_controller_ports-udp", "port"],
     ["unifi", "mgmt", "cfgversion"],
     ["interfaces", "*", "*", "duplex", "auto"],
     ["interfaces", "*", "*", "speed", "auto"],
